@@ -6,7 +6,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -22,23 +25,39 @@ public class Main extends ApplicationAdapter {
     private TiledMap testMap;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera = new OrthographicCamera();
-    private Texture image;
+
+    private Texture playerSpriteSheet;
+    private TextureRegion[][] playerFrames;
+    private Sprite player;
 
     private FitViewport viewport;
+
+    // Config
+    private float playerSpeed = 50;
 
 
     @Override
     public void create() {
         batch = new SpriteBatch();
+        setupWorld();
+        setupPlayer();
+    }
+
+    public void setupWorld() {
         testMap = new TmxMapLoader().load("World/testMap.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(testMap);
         camera.setToOrtho(false, 960, 960);
         camera.update();
         viewport = new FitViewport(960, 960, camera);
-        
-        image = new Texture("World/testTileset.png");
-        
+    }
 
+
+    public void setupPlayer() {
+        playerSpriteSheet = new Texture("Characters/playerAnimations.png");
+        playerFrames = TextureRegion.split(playerSpriteSheet, 32, 32);
+        player = new Sprite(playerFrames[0][1]);
+        player.setOrigin(50, 50);
+        player.setSize(32, 32);
     }
 
     @Override
@@ -49,7 +68,12 @@ public class Main extends ApplicationAdapter {
     }
 
     public void input() {
-        // Process player inputs here
+        // Process user inputs here
+        playerInputs();
+        miscInputs();
+    }
+
+    public void miscInputs() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
             if (isFullscreen) {
                 Gdx.graphics.setWindowedMode(960, 960);
@@ -62,6 +86,22 @@ public class Main extends ApplicationAdapter {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
+        }
+    }
+
+    private void playerInputs() {
+        float delta = Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            player.translateY(delta * playerSpeed);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            player.translateX(delta * -playerSpeed);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            player.translateY(delta * -playerSpeed);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            player.translateX(delta * playerSpeed);
         }
     }
 
@@ -80,7 +120,7 @@ public class Main extends ApplicationAdapter {
         mapRenderer.render();
 
         batch.begin();
-        batch.draw(image, 0, 0);
+        player.draw(batch);
         batch.end();
     }
 
