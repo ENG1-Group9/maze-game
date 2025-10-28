@@ -1,5 +1,9 @@
 package io.github.eng1group9;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,7 +11,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -15,13 +18,14 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
-
+    
     private boolean isFullscreen = false;
     private boolean isPaused = false;
 
@@ -29,23 +33,19 @@ public class Main extends ApplicationAdapter {
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera = new OrthographicCamera();
 
-    private Texture playerSpriteSheet;
-    private TextureRegion[][] playerFrames;
-    private Sprite player;
-
     private FitViewport viewport;
-
-    // Config
-    private float playerSpeed = 100;
-
     private long elapsedTime = 0;
-    private long lastFrameTime = System.currentTimeMillis();
+
+    private Player player;
+    private float playerSpeed = 100;
+    final Vector2 PLAYERSTARTPOS = new Vector2(16, 532);
+ 
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         setupWorld();
-        setupPlayer();
+        player = new Player(PLAYERSTARTPOS);
     }
 
     public void setupWorld() {
@@ -56,23 +56,8 @@ public class Main extends ApplicationAdapter {
         viewport = new FitViewport(480, 320, camera);
     }
 
-
-    public void setupPlayer() {
-        playerSpriteSheet = new Texture("Characters/playerAnimations.png");
-        playerFrames = TextureRegion.split(playerSpriteSheet, 32, 32);
-        player = new Sprite(playerFrames[0][1]);
-        player.translate(16, 532);
-        player.setSize(64, 64);
-    }
-
     @Override
     public void render() {
-        // Move this somewhere else?
-        long frameTime = System.currentTimeMillis() - lastFrameTime;
-        lastFrameTime = System.currentTimeMillis();
-
-        if (!isPaused) elapsedTime += frameTime;
-
         input();
         logic();
         draw();
@@ -140,15 +125,19 @@ public class Main extends ApplicationAdapter {
         float delta = Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
             nextIntendedY +=  delta * playerSpeed;
+            player.playAnimation(1);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             nextIntendedX += delta * -playerSpeed;
+            player.playAnimation(3);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             nextIntendedY += delta * -playerSpeed;
+            player.playAnimation(0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             nextIntendedX +=  delta * playerSpeed;
+            player.playAnimation(2);
         }
 
         if (checkCollision(nextIntendedX, nextIntendedY)) {
@@ -159,7 +148,8 @@ public class Main extends ApplicationAdapter {
 
     public void logic() {
         // Process game logic here
-
+        float delta = Gdx.graphics.getDeltaTime();
+        if (!isPaused) elapsedTime += delta;
     }
 
     public String getClock() {
@@ -188,6 +178,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+        testMap.dispose();
     }
 
     @Override

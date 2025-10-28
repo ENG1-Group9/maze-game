@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "C:/Users/Mat/Documents/newtest.tmx",
+    "activeFile": "testMap.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -74,8 +74,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 251.25,
-                "y": 262.5
+                "x": 244.25,
+                "y": 164.5
             }
         },
         "C:/Users/Mat/Downloads/Asset Pack Free/Asset Pack Free/Tileset/House.tsx": {
@@ -90,8 +90,23 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
-        "TilesetForest.tsx": {
+        "C:/Users/Mat/maze-game/assets/Downloads/Asset Pack Free/Asset Pack Free/Tileset/House.tsx": {
             "scaleInDock": 1
+        },
+        "C:/Users/Mat/maze-game/assets/Downloads/Asset Pack Free/Asset Pack Free/Tileset/dungeons_demo.tsx": {
+            "scaleInDock": 1
+        },
+        "House.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "TilesetForest.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "dungeons_demo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "test.tsx": {
             "dynamicWrapping": false,
@@ -99,11 +114,11 @@
             "scaleInEditor": 1
         },
         "testMap.tmx": {
-            "scale": 0.5,
-            "selectedLayer": 0,
+            "scale": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 469,
-                "y": 725
+                "x": 141.83333333333334,
+                "y": 96
             }
         }
     },
@@ -113,19 +128,22 @@
     "map.tileHeight": 16,
     "map.tileWidth": 16,
     "openFiles": [
-        "C:/Users/Mat/Documents/newtest.tmx",
-        "C:/Users/Mat/Downloads/Asset Pack Free/Asset Pack Free/Tileset/dungeons_demo.tsx",
-        "C:/Users/Mat/Downloads/Asset Pack Free/Asset Pack Free/Tileset/House.tsx",
-        "C:/Users/Mat/Documents/TilesetForest.tsx"
+        "testMap.tmx",
+        "TilesetForest.tsx",
+        "dungeons_demo.tsx",
+        "House.tsx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
+        "House.tsx",
+        "dungeons_demo.tsx",
+        "TilesetForest.tsx",
+        "testMap.tmx",
+        "C:/Users/Mat/Downloads/Asset Pack Free/Asset Pack Free/Tileset/dungeons_demo.tsx",
         "C:/Users/Mat/Documents/TilesetForest.tsx",
         "C:/Users/Mat/Downloads/Asset Pack Free/Asset Pack Free/Tileset/House.tsx",
-        "C:/Users/Mat/Downloads/Asset Pack Free/Asset Pack Free/Tileset/dungeons_demo.tsx",
         "C:/Users/Mat/Documents/newtest.tmx",
         "C:/Users/Mat/Downloads/Asset Pack Free/Asset Pack Free/Tileset/TilesetForest.tsx",
-        "testMap.tmx",
         "C:/Users/Mat/AppData/Local/Temp/056a1df2-811f-422f-8ce2-7a7de68504d8_The Fan-tasy Tileset (Free) 1.5.3.zip.4d8/The Fan-tasy Tileset (Free)/Tiled/Tilemaps/Beginning Fields.tmx",
         "test.tsx"
     ],
