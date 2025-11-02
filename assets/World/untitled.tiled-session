@@ -4,6 +4,7 @@
         "width": 2
     },
     "activeFile": "testMap.tmx",
+    "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "."
     ],

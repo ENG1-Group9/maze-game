@@ -30,6 +30,7 @@ public class AnimatedEntity extends Entity{
 
     private int tileWidth;
     private int tileHeight;
+    private boolean paused = false;
     private float frameInterval = 0.25f;
     private int currentAnimation = 0;
     private float animationPlayTime = 0f;
@@ -52,10 +53,18 @@ public class AnimatedEntity extends Entity{
      * 
      * @param index The index of the desired animation in the list.
      */
-    public void playAnimation(int index) {
+    public void changeAnimation(int index) {
         if (currentAnimation != index) { // checks if the animation is changing
             currentAnimation = index;
         }
+    }
+
+    public void playAnimation() {
+        paused = false;
+    }
+
+    public void pauseAnimation() {
+        paused = true;
     }
 
     public TextureRegion getCurrentFrame() {
@@ -66,7 +75,7 @@ public class AnimatedEntity extends Entity{
     @Override
     public void draw(SpriteBatch batch) {
         float delta = Gdx.graphics.getDeltaTime();
-        animationPlayTime += delta;
+        if (!paused) animationPlayTime += delta;
         TextureRegion currentFrame = getCurrentFrame();
         batch.draw(currentFrame, getX(), getY(), getWidth(), getHeight());
     }

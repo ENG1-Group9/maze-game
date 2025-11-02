@@ -1,6 +1,7 @@
 package io.github.eng1group9;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
@@ -13,11 +14,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -25,6 +33,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
+    private Texture missingTexture;
     
     private boolean isFullscreen = false;
     private boolean isPaused = false;
@@ -35,17 +44,21 @@ public class Main extends ApplicationAdapter {
 
     private FitViewport viewport;
     private long elapsedTime = 0;
+    private boolean showCollision = false;
+
+    private List<Rectangle> worldCollision;
 
     private Player player;
-    private float playerSpeed = 100;
-    final Vector2 PLAYERSTARTPOS = new Vector2(16, 532);
+    final Vector2 PLAYERSTARTPOS = new Vector2(18, 516);
  
 
     @Override
     public void create() {
+        missingTexture = new Texture("missingTexture.png");
         batch = new SpriteBatch();
         setupWorld();
         player = new Player(PLAYERSTARTPOS);
+        setupWorldCollision();
     }
 
     public void setupWorld() {
@@ -65,87 +78,60 @@ public class Main extends ApplicationAdapter {
 
     public void input() {
         // Process user inputs here
-        if (!isPaused) playerInputs();
         miscInputs();
+        player.handleInputs(worldCollision);
     }
+
+
 
     public void miscInputs() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
-            if (isFullscreen) {
+            toggleFullscreen();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            Gdx.app.exit(); // Close the game
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            togglePause();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
+            showCollision = !showCollision;
+        }
+    }
+
+    private void toggleFullscreen() {
+        if (isFullscreen) {
                 Gdx.graphics.setWindowedMode(960, 640);
             }
             else {
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
             }
-
             isFullscreen = !isFullscreen;
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            isPaused = !isPaused;
-        }
     }
 
-    // Returns true if the player can move there
-    private boolean checkCollision(float x, float y) {
-        TiledMapTileLayer collisionLayer = (TiledMapTileLayer) testMap.getLayers().get(0);
-
-        int startX = (int) (x / 32);
-        int startY = (int) (y / 32);
-        int endX = (int) ((x + 32) / 32);
-        int endY = (int) ((y + 32) / 32);
-
-        for (int checkY = startY; checkY <= endY; checkY++) {
-            for (int checkX = startX; checkX <= endX; checkX++) {
-                Cell cell = collisionLayer.getCell(checkX, checkY);
-
-                if (cell == null) {
-                    return false;
-                }
-
-                int tileId = cell.getTile().getId();
-
-                if (tileId == 32 || tileId == 33 || tileId == 34) {
-                    return false;
-                }
-            }
+    private void togglePause() {
+        if (isPaused) {
+            player.unfreeze();
         }
-
-
-        return true;
+        else {
+            player.freeze();
+        }
+        isPaused = !isPaused;
     }
 
-    private void playerInputs() {
-        float nextIntendedX = player.getX();
-        float nextIntendedY = player.getY();
-
-
-        float delta = Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            nextIntendedY +=  delta * playerSpeed;
-            player.playAnimation(1);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            nextIntendedX += delta * -playerSpeed;
-            player.playAnimation(3);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            nextIntendedY += delta * -playerSpeed;
-            player.playAnimation(0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            nextIntendedX +=  delta * playerSpeed;
-            player.playAnimation(2);
+    private void setupWorldCollision() {
+        MapLayer collisionLayer = (MapLayer) testMap.getLayers().get("Collision");
+        MapObjects collisionObjects = collisionLayer.getObjects();
+        worldCollision = new LinkedList<>();
+        for (MapObject mapObject : collisionObjects) {
+            Rectangle nextRectangle = ((RectangleMapObject) mapObject).getRectangle();
+            nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
+            worldCollision.add(nextRectangle);
         }
 
-        if (checkCollision(nextIntendedX, nextIntendedY)) {
-            player.setX(nextIntendedX);
-            player.setY(nextIntendedY);
-        }
     }
 
+    
     public void logic() {
         // Process game logic here
         float delta = Gdx.graphics.getDeltaTime();
@@ -165,8 +151,17 @@ public class Main extends ApplicationAdapter {
         mapRenderer.setView(camera);
         mapRenderer.render();
 
+        
+
         batch.begin();
         player.draw(batch);
+        
+        if (showCollision) { // show collisions for debugging
+            for (Rectangle rectangle : worldCollision) {
+                batch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
+            }
+            batch.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y+ 16, player.getHitbox().width, player.getHitbox().height);
+        }
 
         // Overlay text - must be before batch.end.
         BitmapFont font = new BitmapFont();
