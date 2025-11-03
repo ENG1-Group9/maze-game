@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
@@ -28,6 +29,7 @@ import io.github.eng1group9.entities.*;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
+    private SpriteBatch UI;
     private Texture missingTexture;
     
     private boolean isFullscreen = false;
@@ -57,6 +59,7 @@ public class Main extends ApplicationAdapter {
     public void create() {
         missingTexture = new Texture("missingTexture.png");
         batch = new SpriteBatch();
+        UI = new SpriteBatch();
         setupWorld();
         setupWorldCollision();
         player = new Player(PLAYERSTARTPOS);
@@ -155,12 +158,15 @@ public class Main extends ApplicationAdapter {
 
         camera.update();
         mapRenderer.setView(camera);
-        int[] belowPlayer = {0, 1, 2};
+        int[] belowPlayer = {0, 1, 2}; // the layers which should appear below the player
         mapRenderer.render(belowPlayer);
 
         batch.begin();
         player.draw(batch);
         dean.draw(batch);
+        
+        
+        
         
         if (showCollision) { // show collisions for debugging
             for (Rectangle rectangle : worldCollision) {
@@ -169,15 +175,17 @@ public class Main extends ApplicationAdapter {
             batch.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y+ 16, player.getHitbox().width, player.getHitbox().height);
             batch.draw(missingTexture, dean.getHitbox().x + 16, dean.getHitbox().y+ 16, dean.getHitbox().width, dean.getHitbox().height);
         }
-
-        // Overlay text - must be before batch.end.
-        BitmapFont font = new BitmapFont();
-        font.draw(batch, getClock(), 10, 640 - 10);
-
         batch.end();
+        // Overlay text - must be before batch.end.
 
-        int[] abovePlayer = {3, 4, 5, 6, 7};
+        int[] abovePlayer = {3, 4, 5, 6, 7}; // the layers which should appear above the player
         mapRenderer.render(abovePlayer);
+
+        UI.begin();
+        BitmapFont font = new BitmapFont();
+        font.draw(UI, getClock(), 10, 640 - 10);
+        UI.end();
+        
     }
 
     @Override
