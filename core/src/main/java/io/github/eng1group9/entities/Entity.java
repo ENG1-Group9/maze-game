@@ -130,13 +130,19 @@ public class Entity {
         return other.getHitbox().contains(hitbox) && canCollide && other.hasCollision();
     }
 
+    public float distanceTo(Entity other) {
+        float dx = this.getX() - other.getX();
+        float dy = this.getY() - other.getY();
+        return (float)Math.sqrt((dx * dx) + (dy * dy));
+    }
+
     /**
     * @return wether this entity collides with a rectangle.
     */
     public boolean isColliding(Rectangle rect)  {
         return rect.overlaps(hitbox) && canCollide;
     }
-    
+
 
     /**
      * @return the Texture used by this entity.

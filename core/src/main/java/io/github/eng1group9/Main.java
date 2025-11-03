@@ -2,6 +2,7 @@ package io.github.eng1group9;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -31,7 +32,7 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private SpriteBatch UI;
     private Texture missingTexture;
-    
+
     private boolean isFullscreen = false;
     private boolean isPaused = false;
 
@@ -44,6 +45,7 @@ public class Main extends ApplicationAdapter {
     private boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
+    private List<Rectangle> exitDoorCollision;
 
     private Player player;
     final Vector2 PLAYERSTARTPOS = new Vector2(16, 532);
@@ -85,7 +87,12 @@ public class Main extends ApplicationAdapter {
     public void input() {
         // Process user inputs here
         miscInputs();
-        player.handleInputs(worldCollision);
+
+        if (player.hasKey()) {
+            player.handleInputs(worldCollision);
+        } else {
+            player.handleInputs(Stream.concat(worldCollision.stream(), exitDoorCollision.stream()).toList());
+        }
     }
 
 
@@ -103,7 +110,22 @@ public class Main extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
             showCollision = !showCollision;
         }
-        
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            tryInteract();
+        }
+    }
+
+
+    private void tryInteract() {
+        if (!chest.opened) {
+            if (chest.distanceTo(player) < 50) {
+                player.setHasKey(true);
+                chest.open();
+            }
+        }
+
+        System.out.println(player.hasKey());
     }
 
     private void toggleFullscreen() {
@@ -138,9 +160,18 @@ public class Main extends ApplicationAdapter {
             worldCollision.add(nextRectangle);
         }
 
+
+        MapLayer collisionLayer2 = (MapLayer) testMap.getLayers().get("exitdoor collision");
+        MapObjects collisionObjects2 = collisionLayer2.getObjects();
+        exitDoorCollision = new LinkedList<>();
+        for (MapObject mapObject : collisionObjects2) {
+            Rectangle nextRectangle = ((RectangleMapObject) mapObject).getRectangle();
+            nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
+            exitDoorCollision.add(nextRectangle);
+        }
     }
 
-    
+
     public void logic() {
         // Process game logic here
         float delta = Gdx.graphics.getDeltaTime();
@@ -164,10 +195,11 @@ public class Main extends ApplicationAdapter {
         batch.begin();
         player.draw(batch);
         dean.draw(batch);
-        
-        
-        
-        
+        chest.draw(batch);
+
+
+
+
         if (showCollision) { // show collisions for debugging
             for (Rectangle rectangle : worldCollision) {
                 batch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
@@ -185,7 +217,7 @@ public class Main extends ApplicationAdapter {
         BitmapFont font = new BitmapFont();
         font.draw(UI, getClock(), 10, 640 - 10);
         UI.end();
-        
+
     }
 
     @Override

@@ -24,7 +24,7 @@ public class Player extends AnimatedEntity {
         setPosition(startPos);
         setScale(2);
     }
-    
+
 
     public void handleInputs(List<Rectangle> worldCollision) {
         if (!isFrozen()) {
@@ -78,7 +78,7 @@ public class Player extends AnimatedEntity {
                 setPosition(newX, newY);
         }
     }
-    
+
 
     private boolean safeToMove(float x, float y, List<Rectangle> collisionRectangles) {
         Rectangle testHitbox = new Rectangle();
