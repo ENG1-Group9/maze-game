@@ -11,7 +11,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
@@ -19,7 +18,9 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -78,6 +79,21 @@ public class Main extends ApplicationAdapter {
         viewport = new FitViewport(480, 320, camera);
     }
 
+    public void deleteKeyTile() {
+        TiledMapTileLayer layer = (TiledMapTileLayer) testMap.getLayers().get("key");
+
+        // i = 1; j = 7
+        for (int i = 0; i < 30; i++) {
+            for (int j = 0; j < 30; j++) {
+                Cell cell = layer.getCell(i, j);
+
+                if (cell != null) {
+                    cell.setTile(null);
+                }
+            }
+        }
+    }
+
     @Override
     public void render() {
         input();
@@ -114,6 +130,7 @@ public class Main extends ApplicationAdapter {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             tryInteract();
+            deleteKeyTile();
         }
     }
 

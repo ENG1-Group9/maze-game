@@ -97,6 +97,7 @@ public class Player extends AnimatedEntity {
     }
 
     public void setHasExitKey(Boolean bool) {
+        System.out.println("Got exit key");
         hasExitKey = bool;
     }
     public boolean hasChestRoomKey() {
@@ -104,6 +105,9 @@ public class Player extends AnimatedEntity {
     }
 
     public void setHasChestRoomKey(Boolean bool) {
-        hasChestRoomKey = bool;
+        if (bool) {
+            System.out.println("Got key");
+            hasChestRoomKey = bool;
+        }
     }
 }
