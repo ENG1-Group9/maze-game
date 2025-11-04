@@ -217,7 +217,7 @@ public class Main extends ApplicationAdapter {
             }
             UI.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y+ 16, player.getHitbox().width, player.getHitbox().height);
             UI.draw(missingTexture, dean.getHitbox().x + 16, dean.getHitbox().y+ 16, dean.getHitbox().width, dean.getHitbox().height);
-            chest.draw(batch);
+            chest.draw(UI);
 
         }
         UI.end();
