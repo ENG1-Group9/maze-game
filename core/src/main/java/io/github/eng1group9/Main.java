@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -13,6 +12,7 @@ import io.github.eng1group9.systems.InputSystem;
 import io.github.eng1group9.systems.RenderingSystem;
 import io.github.eng1group9.systems.CollisionSystem;
 import io.github.eng1group9.systems.ToastSystem;
+import io.github.eng1group9.systems.TimerSystem;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -20,7 +20,7 @@ public class Main extends ApplicationAdapter {
     boolean isFullscreen = false;
     boolean isPaused = false;
 
-    private long elapsedTime = 0;
+    private TimerSystem timerSystem = new TimerSystem();
     public boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
@@ -71,7 +71,7 @@ public class Main extends ApplicationAdapter {
     public void render() {
         input();
         logic();
-        renderingSystem.draw(player, dean, showCollision, elapsedTime, worldCollision);
+        renderingSystem.draw(player, dean, showCollision, timerSystem.elapsedTime, worldCollision);
         if (isPaused) {
             renderingSystem.renderPauseOverlay(960, 640);
         }
@@ -125,10 +125,12 @@ public class Main extends ApplicationAdapter {
         if (isPaused) {
             player.unfreeze();
             dean.unfreeze();
+            timerSystem.resume();
         }
         else {
             player.freeze();
             dean.freeze();
+            timerSystem.pause();
         }
         isPaused = !isPaused;
     }
@@ -136,7 +138,8 @@ public class Main extends ApplicationAdapter {
     public void logic() {
         // Process game logic here
         float delta = Gdx.graphics.getDeltaTime();
-        if (!isPaused) elapsedTime += (long) (delta * 1000);
+        if (!isPaused) timerSystem.update(delta);
+        timerSystem.tick();
         dean.nextMove();
         checkForKey();
         checkForNearChestRoomDoorWithKey();
