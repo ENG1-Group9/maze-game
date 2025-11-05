@@ -29,6 +29,7 @@ public class Dean extends MovingEntity {
         reachRectangle = new Rectangle();
         reachRectangle.setPosition(startPos.x -32, startPos.y -32);
         reachRectangle.setSize(reach * 32);
+        setHitbox(new Rectangle());
 
         this.path = path;
         STARTPOS = startPos;
