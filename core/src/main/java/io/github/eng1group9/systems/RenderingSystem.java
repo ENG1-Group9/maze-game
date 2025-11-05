@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import io.github.eng1group9.entities.Dean;
 import io.github.eng1group9.entities.Player;
-import io.github.eng1group9.systems.ToastSystem;
 
 import java.util.List;
 

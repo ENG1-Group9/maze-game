@@ -37,7 +37,7 @@ public class MovingEntity extends AnimatedEntity {
      * @param direction The direction as either 'U' 'D' 'L' or'R' 
      * @param collisionRectangles A list of rectangles which the entity cannot move into.
      */
-    public void move(Character direction, List<Rectangle> collisionRectangles){
+    public void move(Character direction){
         if (!frozen) {
             float delta = Gdx.graphics.getDeltaTime();
             float distance = delta * speed;
@@ -57,25 +57,13 @@ public class MovingEntity extends AnimatedEntity {
                     newX += distance;
                     break;
             }
-            if (safeToMove(newX, newY, collisionRectangles)) {
+            if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox())) {
                 setPosition(newX, newY);
             }
         }
     }
 
-
-    private boolean safeToMove(float x, float y, List<Rectangle> collisionRectangles) {
-        Rectangle testHitbox = new Rectangle();
-        testHitbox = testHitbox.set(getHitbox());
-        testHitbox.setPosition(x + 16, y + 16);
-
-        for (Rectangle rectangle : collisionRectangles) {
-            if (rectangle.overlaps(testHitbox)) {
-                return false;
-            }
-        }
-        return true;
-    }
+ 
 
     public void freeze() {
         frozen = true;

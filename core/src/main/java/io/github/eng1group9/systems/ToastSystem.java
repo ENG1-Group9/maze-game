@@ -3,7 +3,7 @@ package io.github.eng1group9.systems;
 import java.util.LinkedList;
 import java.util.List;
 
-class ToastSystem {
+public class ToastSystem {
     private static class Toast {
         private String text;
         private long createdDate;
@@ -54,4 +54,3 @@ class ToastSystem {
         return toastTexts;
     }
 }
-

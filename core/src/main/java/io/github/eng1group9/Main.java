@@ -1,41 +1,31 @@
 package io.github.eng1group9;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.eng1group9.entities.*;
+import io.github.eng1group9.systems.InputSystem;
 import io.github.eng1group9.systems.RenderingSystem;
+import io.github.eng1group9.systems.CollisionSystem;
 import io.github.eng1group9.systems.ToastSystem;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
 
-    private boolean isFullscreen = false;
-    private boolean isPaused = false;
+    boolean isFullscreen = false;
+    boolean isPaused = false;
 
-    private TiledMap testMap;
     private long elapsedTime = 0;
-    private boolean showCollision = false;
+    public boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
-    private List<Rectangle> exitDoorCollision;
 
-    private Player player;
+    public Player player;
     final Vector2 PLAYERSTARTPOS = new Vector2(16, 532);
     final float DEFAULTPLAYERSPEED = 100;
 
@@ -57,13 +47,14 @@ public class Main extends ApplicationAdapter {
 
     public static Main instance;
     public static RenderingSystem renderingSystem = new RenderingSystem();
+    public static CollisionSystem collisionSystem = new CollisionSystem();
+    public static InputSystem inputSystem = new InputSystem();
 
     @Override
     public void create() {
         renderingSystem.initWorld("World/testMap.tmx", 480, 320);
-        testMap = renderingSystem.getMapRenderer().getMap();
-
-        setupWorldCollision();
+        collisionSystem.init(renderingSystem.getMapRenderer().getMap());
+        worldCollision = collisionSystem.getWorldCollision();
 
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
@@ -73,18 +64,7 @@ public class Main extends ApplicationAdapter {
     }
 
     public void deleteKeyTile() {
-        TiledMapTileLayer layer = (TiledMapTileLayer) testMap.getLayers().get("key");
-
-        // i = 1; j = 7
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
-                Cell cell = layer.getCell(i, j);
-
-                if (cell != null) {
-                    cell.setTile(null);
-                }
-            }
-        }
+        collisionSystem.deleteKeyTile();
     }
 
     @Override
@@ -106,27 +86,6 @@ public class Main extends ApplicationAdapter {
         }
     }
 
-    // Serches collision layer for name
-    // Then deletes from world collision by the rectangle
-    private void removeCollisionByName(String name) {
-        MapLayer collisionLayer = (MapLayer) testMap.getLayers().get("Collision");
-        MapObjects collisionObjects = collisionLayer.getObjects();
-
-        for (MapObject m : collisionObjects) {
-
-            if (m.getName() == null) {
-                continue;
-            }
-
-            if (!m.getName().equals(name)) {
-                continue;
-            }
-
-            Rectangle r = ((RectangleMapObject) m).getRectangle();
-            worldCollision.remove(r);
-        }
-    }
-
     private void checkForNearChestRoomDoorWithKey() {
         float playerX = player.getX();
         float playerY = player.getY();
@@ -134,43 +93,16 @@ public class Main extends ApplicationAdapter {
         if (((playerX - 238) * (playerX - 238)) + ((playerY - 353) * (playerY - 353)) < 50) {
             if (player.hasChestRoomKey()) {
                 ToastSystem.addToast("You opened the door");
-                removeCollisionByName("chestRoomDoor");
+                collisionSystem.removeCollisionByName("chestRoomDoor");
             }
         }
     }
 
     public void input() {
-        // Process user inputs here
-        miscInputs();
-
-        if (player.hasExitKey()) {
-            player.handleInputs(worldCollision);
-        } else {
-            player.handleInputs(Stream.concat(worldCollision.stream(), exitDoorCollision.stream()).collect(Collectors.toList()));
-        }
+        inputSystem.handle(player);
     }
 
-    public void miscInputs() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
-            toggleFullscreen();
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit(); // Close the game
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            togglePause();
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
-            showCollision = !showCollision;
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            tryInteract();
-        }
-    }
-
-
-    private void tryInteract() {
+    public void tryInteract() {
         if (!chest.opened) {
             if (chest.distanceTo(player) < 50) {
                 player.setHasExitKey(true);
@@ -179,7 +111,7 @@ public class Main extends ApplicationAdapter {
         }
     }
 
-    private void toggleFullscreen() {
+    public void toggleFullscreen() {
         if (isFullscreen) {
                 Gdx.graphics.setWindowedMode(960, 640);
             }
@@ -189,7 +121,7 @@ public class Main extends ApplicationAdapter {
             isFullscreen = !isFullscreen;
     }
 
-    private void togglePause() {
+    public void togglePause() {
         if (isPaused) {
             player.unfreeze();
             dean.unfreeze();
@@ -201,33 +133,11 @@ public class Main extends ApplicationAdapter {
         isPaused = !isPaused;
     }
 
-    private void setupWorldCollision() {
-        MapLayer collisionLayer = (MapLayer) testMap.getLayers().get("Collision");
-        MapObjects collisionObjects = collisionLayer.getObjects();
-        worldCollision = new LinkedList<>();
-        for (MapObject mapObject : collisionObjects) {
-            Rectangle nextRectangle = ((RectangleMapObject) mapObject).getRectangle();
-            nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
-            worldCollision.add(nextRectangle);
-        }
-
-
-        MapLayer collisionLayer2 = (MapLayer) testMap.getLayers().get("exitdoor collision");
-        MapObjects collisionObjects2 = collisionLayer2.getObjects();
-        exitDoorCollision = new LinkedList<>();
-        for (MapObject mapObject : collisionObjects2) {
-            Rectangle nextRectangle = ((RectangleMapObject) mapObject).getRectangle();
-            nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
-            exitDoorCollision.add(nextRectangle);
-        }
-    }
-
-
     public void logic() {
         // Process game logic here
         float delta = Gdx.graphics.getDeltaTime();
         if (!isPaused) elapsedTime += (long) (delta * 1000);
-        dean.nextMove(worldCollision);
+        dean.nextMove();
         checkForKey();
         checkForNearChestRoomDoorWithKey();
     }

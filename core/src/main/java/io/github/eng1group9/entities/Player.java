@@ -27,33 +27,6 @@ public class Player extends MovingEntity {
         setScale(2);
     }
 
-    /**
-     * Move the player if directional keys are being pressed.
-     * @param worldCollision A list of rectangles the player cannot walk through.
-     */
-    public void handleInputs(List<Rectangle> worldCollision) {
-        if (!isFrozen()) {
-            if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                move('U', worldCollision);
-                changeAnimation(1);
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                move('L', worldCollision);
-                changeAnimation(3);
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                move('D', worldCollision);
-                changeAnimation(0);
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                move('R', worldCollision);
-                changeAnimation(2);
-            }
-        }
-    }
-
-
-
     public boolean hasExitKey() {
         return hasExitKey;
     }

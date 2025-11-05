@@ -28,10 +28,10 @@ public class Dean extends MovingEntity {
         this.path = path;
     }
 
-    public void nextMove(List<Rectangle> worldCollision) {
+    public void nextMove() {
         if (!isFrozen()) {
             Character direction = getNextDirection();
-             move(direction, worldCollision);
+             move(direction);
              updateAnimation(direction);
              stepsLeft--;
              if (stepsLeft == 0) {
