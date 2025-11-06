@@ -1,16 +1,9 @@
 package io.github.eng1group9.entities;
 
-import java.util.List;
-
 import io.github.eng1group9.Main;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.systems.ToastSystem;
-import io.github.eng1group9.systems.CollisionSystem;
 
 /**
  * Handles everything connected to the player.

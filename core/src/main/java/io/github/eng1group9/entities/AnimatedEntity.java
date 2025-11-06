@@ -23,13 +23,7 @@ import com.badlogic.gdx.math.Vector2;
  * @author Mat.
  */
 public class AnimatedEntity extends Entity{
-
-    private TextureRegion[][] spriteSheet;
     private List<Animation<TextureRegion>> animations = new ArrayList<Animation<TextureRegion>>();
-    private int index = 0;
-
-    private int tileWidth;
-    private int tileHeight;
     private boolean paused = false;
     private float frameInterval = 0.25f;
     private int currentAnimation = 0;
@@ -38,9 +32,6 @@ public class AnimatedEntity extends Entity{
 
     public AnimatedEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight) {
         super(new Vector2(0,0), tileWidth, tileHeight);
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
-
         TextureRegion[][] tmp = TextureRegion.split(spriteSheetTexture, tileWidth, tileHeight);
         for (int i = 0; i < frameNumbers.length; i++) {
             Animation<TextureRegion> nextAnimation = new Animation<>(frameInterval, tmp[i]);
