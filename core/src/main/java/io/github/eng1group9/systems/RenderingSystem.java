@@ -5,15 +5,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-
-import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Dean;
 import io.github.eng1group9.entities.Player;
 import io.github.eng1group9.systems.ToastSystem.Toast;
@@ -29,13 +26,14 @@ public class RenderingSystem {
     private OrthographicCamera camera;
     private FitViewport viewport;
     private OrthogonalTiledMapRenderer mapRenderer;
+    private static TiledMap map;
 
     public void initWorld(String tmxPath, int viewportWidth, int viewportHeight) {
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, viewportWidth, viewportHeight);
         this.camera.update();
         this.viewport = new FitViewport(viewportWidth, viewportHeight, camera);
-        TiledMap map = new TmxMapLoader().load(tmxPath);
+        map = new TmxMapLoader().load(tmxPath);
         this.mapRenderer = new OrthogonalTiledMapRenderer(map);
         this.missingTexture = new Texture("missingTexture.png");
         this.worldBatch = new SpriteBatch();
@@ -49,6 +47,9 @@ public class RenderingSystem {
         return Integer.toString(500 - (int)(elapsedTime / 1000));
     }
 
+    public static void hideLayer(String name) {
+        map.getLayers().get(name).setVisible(false);;
+    }
 
     public void draw(Player player, Dean dean, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision) {
         ScreenUtils.clear(Color.BLACK);
@@ -56,7 +57,7 @@ public class RenderingSystem {
 
         camera.update();
         mapRenderer.setView(camera);
-        int[] belowPlayer = {0, 1, 2, 3, 4}; // the layers which should appear below the player
+        int[] belowPlayer = {0, 1, 2, 3, 4, 5}; // the layers which should appear below the player
         mapRenderer.render(belowPlayer);
 
         worldBatch.begin();
@@ -64,7 +65,7 @@ public class RenderingSystem {
         dean.draw(worldBatch);
         worldBatch.end();
 
-        int[] abovePlayer = { 5, 6, 7, 8, 9, 10}; // the layers which should appear above the player
+        int[] abovePlayer = {6, 7, 8, 9, 10, 11, 12}; // the layers which should appear above the player
         mapRenderer.render(abovePlayer);
         uiBatch.begin();
         font.draw(uiBatch, "Time left: " + getClock(elapsedTime), 10, 640 - 10);

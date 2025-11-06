@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Rectangle;
 
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
-import io.github.eng1group9.systems.TriggerSystem.Trigger;
 
 /**
  * The system used to make things happen if a player enters a given area.
@@ -164,7 +163,7 @@ public class TriggerSystem {
                 
                 break;
             case 3: // Standing by the switch 
-                
+                Main.dropSpikes();
                 break;
             case 4: // Standing by the mouse hole
                 

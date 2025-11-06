@@ -51,9 +51,7 @@ public class CollisionSystem {
         }
     }
 
-    public void hideLayer(String name) {
-        map.getLayers().get(name).setVisible(false);;
-    }
+    
 
     public void showLayer(String name) {
         map.getLayers().get(name).setVisible(true);;

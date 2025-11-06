@@ -116,7 +116,7 @@ public class Main extends ApplicationAdapter {
         if (player.hasChestRoomKey() && !chestDoorOpen) {
             ToastSystem.addToast("You Opened the Door!", GOOD);
             collisionSystem.removeCollisionByName("chestRoomDoor");
-            collisionSystem.hideLayer("ChestDoorClosed");
+            RenderingSystem.hideLayer("ChestDoorClosed");
             chestDoorOpen = true;
         }
     }
@@ -125,7 +125,7 @@ public class Main extends ApplicationAdapter {
         if (player.hasExitKey() && !exitOpen) {
             ToastSystem.addToast("You Opened the Exit!", GOOD);
             collisionSystem.removeCollisionByName("exitDoor");
-            collisionSystem.hideLayer("ExitClosed");
+            RenderingSystem.hideLayer("ExitClosed");
             exitOpen = true;
         }
     }
@@ -232,6 +232,13 @@ public class Main extends ApplicationAdapter {
         dean.unfreeze();
         player.unfreeze();
         playerCaught = false;
+    }
+
+    public static void dropSpikes() {
+        collisionSystem.removeCollisionByName("chestRoomSpikes");
+        ToastSystem.addToast("You Lowered the Spikes!", GOOD);
+        RenderingSystem.hideLayer("Spikes");
+        RenderingSystem.hideLayer("Switch");
     }
 
     @Override
