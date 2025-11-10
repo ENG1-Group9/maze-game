@@ -159,8 +159,11 @@ public class RenderingSystem {
      * Display the pause overlay, with instructions and controls. 
      * @param screenWidth - how many pixels wide the screen is. 
      * @param screenHeight - how many pixels high the screen is. 
+     * @param positiveEventCounter - Number of PowerUps collected.
+     * @param negativeEventCounter - Number of times caught by the dean.
+     * @param hiddenEventCounter - Number of secrets found.
      */
-    public void renderPauseOverlay(int screenWidth, int screenHeight) {
+    public void renderPauseOverlay(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
         uiBatch.setColor(0, 0, 0, 0.5f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
@@ -169,14 +172,10 @@ public class RenderingSystem {
         font.getData().setScale(2f);
         font.draw(uiBatch, "Escape from Uni", screenWidth / 2f, (screenHeight / 2f) + 40);
         font.draw(uiBatch, "Instructions", screenWidth / 2f, (screenHeight / 2f) - 120);
-
+        font.draw(uiBatch, "Stats", screenWidth / 2f, (screenHeight / 2f) - 200);
         font.getData().setScale(1f);
-        font.draw(uiBatch, "Press P to resume!", screenWidth / 2f, screenHeight / 2f);
-        font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 20);
-        font.draw(uiBatch, "Press E to interact.", screenWidth / 2f, (screenHeight / 2f) - 40);
-        font.draw(uiBatch, "Use WASD or arrow keys to move.", screenWidth / 2f, (screenHeight / 2f) - 60);
-        font.draw(uiBatch, "Press F11 to Fullscreen.", screenWidth / 2f, (screenHeight / 2f) - 80);
-        font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 160);
+        renderControls(screenWidth, screenHeight);
+        renderStats(screenWidth, screenHeight, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
         
         uiBatch.end();
     }
@@ -195,22 +194,45 @@ public class RenderingSystem {
         font.getData().setScale(2f);
         font.draw(uiBatch, "Escape from Uni", screenWidth / 2f, (screenHeight / 2f) + 40);
         font.draw(uiBatch, "Instructions", screenWidth / 2f, (screenHeight / 2f) - 120);
-
+        
         font.setColor(0, 1, 1, 1);
         font.draw(uiBatch, "Press Space to Start!", screenWidth / 2f, (screenHeight / 2f) - 200);
         font.setColor(1, 1, 1, 1);
 
         font.getData().setScale(1f);
-        font.draw(uiBatch, "Press P to pause!", screenWidth / 2f, screenHeight / 2f);
+        renderControls(screenWidth, screenHeight);
+        font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 160);
+        
+
+        uiBatch.end();
+    }
+
+    /**
+     * Render the controls list, tellign you all the buttons and what they do. 
+     * @param screenWidth - how many pixels wide the screen is. 
+     * @param screenHeight - how many pixels high the screen is. 
+     */
+    private void renderControls(int screenWidth, int screenHeight) {
+        font.draw(uiBatch, "Press P to pause / resume!", screenWidth / 2f, screenHeight / 2f);
         font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 20);
         font.draw(uiBatch, "Press E to interact.", screenWidth / 2f, (screenHeight / 2f) - 40);
         font.draw(uiBatch, "Use WASD or arrow keys to move.", screenWidth / 2f, (screenHeight / 2f) - 60);
         font.draw(uiBatch, "Press P to pause!", screenWidth / 2f, screenHeight / 2f);
         font.draw(uiBatch, "Press F11 to Fullscreen.", screenWidth / 2f, (screenHeight / 2f) - 80);
-        font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 160);
-        
+    }
 
-        uiBatch.end();
+    /**
+     * Render the Stats at the bottom of the overlay, showing PowerUps collected, times caught and secrets found.
+     * @param screenWidth - how many pixels wide the screen is. 
+     * @param screenHeight - how many pixels high the screen is. 
+     * @param positiveEventCounter - Number of PowerUps collected.
+     * @param negativeEventCounter - Number of times caught by the dean.
+     * @param hiddenEventCounter - Number of secrets found.
+     */
+    private void renderStats(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
+        font.draw(uiBatch, "PowerUps Collected: " + positiveEventCounter, screenWidth / 2f, (screenHeight / 2f) - 240);
+        font.draw(uiBatch, "Dean Captures: " + negativeEventCounter, screenWidth / 2f, (screenHeight / 2f) - 260);
+        font.draw(uiBatch, "Secrets Found: " + hiddenEventCounter, screenWidth / 2f, (screenHeight / 2f) - 280);
     }
 
     /**
@@ -219,21 +241,26 @@ public class RenderingSystem {
      * @param screenHeight - How many pixels high the screen is. 
      * @param timeLeft - How much time was left when the player escaped.
      * @param score - the score the player managed to get. 
+     * @param positiveEventCounter - Number of PowerUps collected.
+     * @param negativeEventCounter - Number of times caught by the dean.
+     * @param hiddenEventCounter - Number of secrets found.
      */
-    public void renderWinOverlay(int screenWidth, int screenHeight, float timeLeft, int score) {
+    public void renderWinOverlay(int screenWidth, int screenHeight, float timeLeft, int score, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
         uiBatch.setColor(0, 0, 0, 0.5f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
         uiBatch.setColor(1, 1, 1, 1);
 
         font.getData().setScale(2f);
+        font.draw(uiBatch, "Stats", screenWidth / 2f, (screenHeight / 2f) - 200);
         font.setColor(0, 1, 1, 1);
         font.draw(uiBatch, "YOU WIN!", screenWidth / 2f, (screenHeight / 2f) + 40);
         font.setColor(1, 1, 1, 1);
         font.getData().setScale(1f);
-        font.draw(uiBatch, "Time Left: " + timeLeft, screenWidth / 2f, screenHeight / 2f);
+        font.draw(uiBatch, TimerSystem.getClockDisplay(), screenWidth / 2f, screenHeight / 2f);
         font.draw(uiBatch, "Score: " + Integer.toString(score), screenWidth / 2f, (screenHeight / 2f) - 20);
         font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 40);
+        renderStats(screenWidth, screenHeight, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
         uiBatch.end();
     }
 
@@ -241,20 +268,25 @@ public class RenderingSystem {
      * Display the lose overlay, for when you run out of time. 
      * @param screenWidth - How many pixels wide the screen is. 
      * @param screenHeight - How many pixels high the screen is. 
+     * @param positiveEventCounter - Number of PowerUps collected.
+     * @param negativeEventCounter - Number of times caught by the dean.
+     * @param hiddenEventCounter - Number of secrets found.
      */
-    public void renderLoseOverlay(int screenWidth, int screenHeight) {
+    public void renderLoseOverlay(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
         uiBatch.setColor(0, 0, 0, 0.5f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
         uiBatch.setColor(1, 1, 1, 1);
 
         font.getData().setScale(2f);
+        font.draw(uiBatch, "Stats", screenWidth / 2f, (screenHeight / 2f) - 200);
         font.setColor(1, 0, 0, 1);
         font.draw(uiBatch, "TIME IS UP!", screenWidth / 2f, (screenHeight / 2f) + 40);
         font.setColor(1, 1, 1, 1);
         font.getData().setScale(1f);
         font.draw(uiBatch, "Better luck next time.", screenWidth / 2f, screenHeight / 2f);
         font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 40);
+        renderStats(screenWidth, screenHeight, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
         uiBatch.end();
     }
 }

@@ -61,7 +61,6 @@ public class TimerSystem {
 
     public static String getClockDisplay() {
         int timeLeft = getTimeLeft();
-        System.out.println(timeLeft / 60);
         String mins = getMinsDisplay(timeLeft);
         String secs = getSecsDisplay(timeLeft);
         return "Time Left: " + mins + ":" + secs;

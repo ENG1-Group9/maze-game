@@ -32,6 +32,9 @@ public class Main extends ApplicationAdapter {
     public static boolean spikesLowered = false; // Wether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Wether the scroll power up has been collected.
     public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found. 
+    public static int hiddenEventCounter = 0;
+    public static int negativeEventCounter = 0;
+    public static int positiveEventCounter = 0;
 
     private static TimerSystem timerSystem = new TimerSystem();
     public boolean showCollision = false;
@@ -102,6 +105,7 @@ public class Main extends ApplicationAdapter {
             longboiBonus = LONGBOIBONUSAMOUNT;
             ToastSystem.addToast("You found my potion! Thank you!", messageColour);
             RenderingSystem.showLayer("LONGBOI");
+            hiddenEventCounter++;
         }
     }
 
@@ -112,13 +116,13 @@ public class Main extends ApplicationAdapter {
                 renderingSystem.renderStartOverlay(960, 640);
                 break;
             case 2:
-                renderingSystem.renderPauseOverlay(960, 640);
+                renderingSystem.renderPauseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             case 3:
-                renderingSystem.renderWinOverlay(960, 640, timerSystem.getTimeLeft(), calculateScore());
+                renderingSystem.renderWinOverlay(960, 640, timerSystem.getTimeLeft(), calculateScore(), positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             case 4:
-                renderingSystem.renderLoseOverlay(960, 640);
+                renderingSystem.renderLoseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             default:
                 break;
@@ -162,6 +166,7 @@ public class Main extends ApplicationAdapter {
             scrollUsed = true;
             ToastSystem.addToast("You got the Scroll!", GOOD);
             ToastSystem.addToast("You are invisible for 15s", GOOD);
+            positiveEventCounter++;
         }
     }
 
@@ -218,9 +223,11 @@ public class Main extends ApplicationAdapter {
      * This will freeze the player/dean, stop all game logic and display the pause overlay. 
      */
     public static void togglePause() {
-        if (gameState == 2 && !playerCaught) {
-            player.unfreeze();
-            dean.unfreeze();
+        if (gameState == 2) {
+            if (!playerCaught) {
+                player.unfreeze();
+                dean.unfreeze();
+            }
             gameState = 1;
         }
         else {
@@ -249,7 +256,7 @@ public class Main extends ApplicationAdapter {
         if (dean.canReach(player) && !playerCaught) {
             startPlayerCatch();
         }
-        else if (playerCaught && gameState == 1) {
+        else if (playerCaught) {
             if (playerCaughtTime <= 0) {
                 endPlayerCatch();
                 playerCaughtTime = INITALPLAYERCAUGHTTIME;
@@ -267,15 +274,16 @@ public class Main extends ApplicationAdapter {
      * This will freeze the player and dean. 
      */
     private void startPlayerCatch() {
+        playerCaught = true;
         player.freeze();
         player.setPosition(PLAYERSTARTPOS);
         dean.freeze();
         dean.changeAnimation(3);
         dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-        playerCaught = true;
         timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME); // 48 not 50 because you spend 2s stood while the timer goes down.
         ToastSystem.addToast("You were caught by the Dean!", BAD);
         ToastSystem.addToast("You were stuck being lectured for 50s!", BAD);
+        negativeEventCounter++;
     }
 
     /**
